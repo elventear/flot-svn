@@ -136,7 +136,7 @@
         ctx = null, octx = null,
         xaxes = [], yaxes = [],
         plotOffset = { left: 0, right: 0, top: 0, bottom: 0},
-        canvasWidth = 0, canvasHeight = 0,
+        canvasWidth = 0, canvasHeight = 0, id,
         plotWidth = 0, plotHeight = 0,
         hooks = {
             processOptions: [],
@@ -697,17 +697,22 @@
         }
 
         function constructCanvas() {
-            function makeCanvas(width, height) {
+            function makeCanvas(width, height, id) {
                 var c = document.createElement('canvas');
                 c.width = width;
                 c.height = height;
+                if (id) c.id = id;
                 if (!c.getContext) // excanvas hack
                     c = window.G_vmlCanvasManager.initElement(c);
                 return c;
             }
             
+            var new_id;
+            
             canvasWidth = placeholder.width();
             canvasHeight = placeholder.height();
+            id = placeholder[0].id;
+            
             placeholder.html(""); // clear placeholder
             if (placeholder.css("position") == 'static')
                 placeholder.css("position", "relative"); // for positioning labels and overlay
@@ -719,11 +724,13 @@
                 window.G_vmlCanvasManager.init_(document); // make sure everything is setup
             
             // the canvas
-            canvas = $(makeCanvas(canvasWidth, canvasHeight)).appendTo(placeholder).get(0);
+            new_id = id? id+'-1' : null;
+            canvas = $(makeCanvas(canvasWidth, canvasHeight, new_id)).appendTo(placeholder).get(0);
             ctx = canvas.getContext("2d");
 
             // overlay canvas for interactive features
-            overlay = $(makeCanvas(canvasWidth, canvasHeight)).css({ position: 'absolute', left: 0, top: 0 }).appendTo(placeholder).get(0);
+            new_id = id? id+'-2' : null;
+            overlay = $(makeCanvas(canvasWidth, canvasHeight, new_id)).css({ position: 'absolute', left: 0, top: 0 }).appendTo(placeholder).get(0);
             octx = overlay.getContext("2d");
             octx.stroke();
         }
